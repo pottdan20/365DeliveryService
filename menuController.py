@@ -1,5 +1,9 @@
+from backendDriver import good_id_by_name, menu_items
+
+
 def getMenuItems():
-    return [["cake",12.5],["salad", 8.99]]
+    return menu_items()
+
 
 def getItemIdByName(name):
-    return 1111
+    return good_id_by_name(name)
