@@ -3,6 +3,15 @@ import urllib.parse
 import os
 from dotenv import load_dotenv
 
+main_connection = None
+
+
+def get_connection():
+    if main_connection:
+        return main_connection
+    else:
+        create_connection()
+
 
 def create_connection():
     # Load env file
@@ -22,6 +31,6 @@ def create_connection():
     engine = sqlalchemy.create_engine(connectionString)
 
     # Create a single connection to the database. Later we will discuss pooling connections.
-    conn = engine.connect()
+    main_connection = engine.connect()
 
-    return conn
+    return main_connection

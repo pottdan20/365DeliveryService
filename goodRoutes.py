@@ -1,9 +1,9 @@
 import sqlalchemy
-from connection import create_connection
+from connection import get_connection
 
 
 def good_id_by_name(item):
-    conn = create_connection()
+    conn = get_connection()
     sql = "SELECT * FROM goods WHERE Name = \"%s\"" % item
 
     result = conn.execute(sqlalchemy.text(sql)).first()[0]
@@ -11,7 +11,7 @@ def good_id_by_name(item):
     return result
 
 def menu_items():
-    conn = create_connection()
+    conn = get_connection()
     sql = "SELECT Name, Cost FROM goods"
 
     result = conn.execute(sqlalchemy.text(sql))
