@@ -6,11 +6,8 @@ def good_id_by_name(item):
     conn = get_connection()
     sql = sqlalchemy.text("SELECT gid FROM goods WHERE Name = :i").bindparams(i = item)
 
-    try:
-        result = conn.execute((sql)).first()[0]
-    except:
-        return None
-
+    result = conn.execute((sql)).first()[0]
+    
     return result
 
 
