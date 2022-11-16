@@ -51,8 +51,8 @@ def main():
                     continue
             
             # user is logged in for all code below
-            if(args == None):
-                args = input("Enter Command: ").split(" ")
+            
+            args = input("Enter Command: ").split(" ")
 
 
             if args[0] == "menu": #list menu
@@ -69,14 +69,40 @@ def main():
 
                 try:
                     newItem = getItemIdByName(itemName)
-                    cart.append([newItem, quant])
+                    newEntry = True
+                    for i in cart:
+                        if i.get("id") == newItem:
+                            i["count"] +=  quant
+                            newEntry = False
+                    if newEntry:
+                        cart.append({"id": newItem, "name": itemName, "count": quant})
                     print(cart)
                 except:
                     print("error adding to cart. retry")
                     args = None
                     continue
+            elif args[0] == "remove":
+                try:
+                    itemName = args[1]
+                    quant = int(args[2])
+                except:
+                    print("invalid input format: add [name of item] [count]")
+                    args = None
+                    continue
 
-            args = input("next? ").split(" ")
+                # try:
+                for i in range(0,len(cart)):
+                    if cart[i].get("name") == itemName:
+                        if(quant >=  cart[i].get("count")):
+                            del cart[i]
+                        else:
+                            cart[i]["count"] -= quant
+                print(cart)
+                '''except:
+                    print("error removing from. retry")
+                    args = None
+                    continue'''
+
                 
                 
     # except Exception as e: print(e)

@@ -25,6 +25,8 @@ def createUser(email, password): # create and return the user object created
     result = conn.execute(sql)
     
     return result
+
+
 def deleteUser(email):
     conn = get_connection()
     sql = sqlalchemy.text("delete from users where email = :e").bindparams(e = email)
@@ -34,6 +36,7 @@ def deleteUser(email):
 def attemptLogin(email, password): #will attempt to login with current credentials and either throw an error if no user exisits
     conn = get_connection()
     sql = sqlalchemy.text("select email from users where email = :e and password = :p").bindparams(e = email, p = hashlib.sha256(password.encode("utf-8")).hexdigest())
+    
     result = conn.execute(sql).first()[0]          # or will return user object
     return result                        
 
