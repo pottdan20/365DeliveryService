@@ -18,7 +18,7 @@ def main():
             if(currentUser is None):
                 args = input("login or signup? ").split(" ")
                 if(args[0] == "signup"):
-                    username = input("input username: ")
+                    username = input("input email: ")
                     if checkIfUserExist(username):
                         print("this user exisit, try restarting and logging in")
                         args = None
@@ -37,12 +37,12 @@ def main():
                         continue
 
                 elif args[0] == "login":
-                    username = input("username: ")
+                    username = input("email: ")
                     password = input("password: ")
                     try:
                         currentUser = attemptLogin(username, password)
                     except:
-                        print("error: username or password are incorrect")
+                        print("error: email or password are incorrect")
                         args = None
                         continue
                 else:

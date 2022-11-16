@@ -10,7 +10,7 @@ def get_connection():
     if main_connection:
         return main_connection
     else:
-        create_connection()
+        return create_connection()
 
 
 def create_connection():
