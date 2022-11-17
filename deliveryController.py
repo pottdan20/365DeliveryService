@@ -15,10 +15,19 @@ def attemptToCancel(orderID):
     print("canceling 123333")
 
 def canRate(id): #true if driver has not picked up order yet
-    return True
+    conn = get_connection()
+    with conn.begin():
+        sql = sqlalchemy.text(" Select status from deliveries where Did = :did").bindparams(did = id)
+        result = conn.execute(sql).first()[0]
+        if result != "delivered":
+            return False
+        return True
 
 def rateDelivery(id, rate):
-    print("rating del")
+    conn = get_connection()
+    sql = sqlalchemy.text(" update deliveries set rating = :r where Did = :did").bindparams(did = id, r=rate)
+    result = conn.execute(sql)
+    
 
 if __name__ == '__main__':
     createDelivery([{}])

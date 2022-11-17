@@ -106,30 +106,24 @@ def main():
                 for i in cart:
                     print(i.get("name") + ": " + str(i.get("count")))
             elif args[0] == "checkout":
-                #try:
+                if len(cart) == 0:
+                    print("add an item to cart first")
+                    continue
+                try:
                     addr = input("delivery address: ")
                     deliveryId = createDelivery(currentUser, addr, cart)
                     presentAfterOrderOptions(deliveryId)
-                #except:
+                except:
                     print("error checkingout. please try again")
 
 
 def presentAfterOrderOptions(id):
     print("\n_____________________________")
-    print("order placed...\nyou can cancel before a driver picks it up, wait to rate this delivery, or be done and wait for arrival")
+    print("order placed...\nwait to rate this delivery or just leave and wait for arrival")
     print("please wait for arrival")
     while True:
-        arg = input("[cancel,rate,done]: ")
-        if arg == "cancel":
-            try:
-                if attemptToCancel(id):
-                    print("\norder canceled\n")
-                    break
-                else:
-                    print("sorry, your driver is enroute... order can not be canceled")
-            except:
-                print("error canceling order...")
-        elif arg == "rate":
+        arg = input("[rate,leave]: ")
+        if arg == "rate":
             try:
                 if canRate(id):
                     try:
@@ -145,7 +139,7 @@ def presentAfterOrderOptions(id):
             except:
                 print("error rating...")
                 continue
-        elif arg == "done" or arg == "q":
+        elif arg == "leave" or arg == "q":
             break
         else:
             print("please enter valid command\n")
