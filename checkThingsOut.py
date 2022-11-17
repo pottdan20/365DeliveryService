@@ -46,15 +46,28 @@ def selectAllDeliveryItems():
     for row in result:
         print(row)
 
-def describeDeliveries():
+def selectAllUsers():
     conn = get_connection()
-    sql = "describe deliveries"
-
+    sql = "select * from users"
     result = conn.execute(sqlalchemy.text(sql))
 
     for row in result:
         print(row)
 
+def describeDeliveries():
+    conn = get_connection()
+    sql = "describe deliveries"
+    with conn.begin():
+        result1 = conn.execute(sqlalchemy.text(sql))
+        result2 = conn.execute(sqlalchemy.text("showTables"))
+
+
+
+    
+    for row in result1:
+        print(row)
+
 
 if __name__ == '__main__':
-    selectAllDeliveryItems()
+    selectAllUsers()
+    
