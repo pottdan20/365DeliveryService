@@ -1,10 +1,10 @@
 import sys
-
+import time    
 
 from userController import checkIfUserExist , createUser, attemptLogin
 from menuController import getMenuItems, getItemIdByName
 from deliveryController import createDelivery, attemptToCancel, canRate, rateDelivery
-
+from driverController import getAllAvailableDeliveries, checkIfDeliveryExist, pickupDelivery, completeDelivery, validPickupDelivery
 
 
 def main():
@@ -53,7 +53,6 @@ def main():
             # user is logged in for all code below
             
             args = input("Enter Command: ").split(" ")
-
 
             if args[0] == "menu": #list menu
                 menuItems = getMenuItems()
@@ -112,6 +111,62 @@ def main():
                     presentAfterOrderOptions(deliveryId)
                 #except:
                     print("error checkingout. please try again")
+            elif args[0] == "clockin":  # Enter Driver Mode 
+                driverMode(currentUser, args) 
+
+
+def driverMode(UId, args):
+    current_time = time.strftime('%Y-%m-%d %H:%M:%S')
+
+    print("----------------Driver Mode----------------")
+    print(f"\nClocked in at: {current_time}")
+    
+    print("\nAvailable deliveries:")
+    open_deliveries = getAllAvailableDeliveries()
+    for delivery in open_deliveries:
+        print(f"\nDId: {delivery[0]}")
+        print(f"PickupLocation: {delivery[4]}")
+        print(f"PickupLocation: {delivery[5]}")
+
+    print("\nCommands:")
+    print("\trefresh")
+    print("\tpickup [Did]")
+    print("\tcomplete")
+    print("\tclockout")
+
+    while args[0] != "q":  # Driver mode loop
+        args = input("[refresh, pickup [DId], complete, clockout]: ").split(" ")
+        if args[0] == "refresh":  # print out all available deliveries
+            print("Available deliveries:")
+            open_deliveries = getAllAvailableDeliveries()
+            for delivery in open_deliveries:
+                print(f"\nDId: {delivery[0]}")
+                print(f"PickupLocation: {delivery[4]}")
+                print(f"PickupLocation: {delivery[5]}")
+
+        elif args[0] == "pickup" and len(args) == 2:  
+            DId = args[1]
+            if checkIfDeliveryExist(DId) and validPickupDelivery(DId):
+                pickupDelivery(UId, DId)
+            else:  # pickup failed - still stay in Driver Mode
+                print("Invalid DId. Try another DId.")  
+                continue
+
+            arg = ""
+            while arg != "q":  
+                arg = input("[complete]: ")  # Driver must complete delivery
+                
+                if arg == "complete":
+                    completeDelivery(DId)
+                    print("Thanks for completing a delivery!")
+                    break
+        elif args[0] == "complete":
+            print("Delivery not picked up yet. Pickup a delivery, refresh or quit.")
+
+        elif args[0] == "clockout":  # exit Driver Mode
+            current_time = time.strftime('%Y-%m-%d %H:%M:%S')
+            print(f"Clocked out at: {current_time}")
+            break
 
 
 def presentAfterOrderOptions(id):
