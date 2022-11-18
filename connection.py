@@ -29,8 +29,8 @@ def create_connection():
 
     # Create a new DB engine based on our connection string
     engine = sqlalchemy.create_engine(connectionString)
-
     # Create a single connection to the database. Later we will discuss pooling connections.
     main_connection = engine.connect()
+    
 
     return main_connection
