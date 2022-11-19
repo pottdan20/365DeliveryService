@@ -1,6 +1,6 @@
 from adminController import getAvgRating, getAllAvgRatings, getMostPopularItems
 
-arg = input("[1]: rating by id\n [2]: rating of all drivers\n[3]:most popular items")
+arg = input("[1]: rating by id\n [2]: rating of all drivers\n[3]:most popular items\n")
 if arg == "1":
     id = input("driverId: ")
     try:
