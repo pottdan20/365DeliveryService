@@ -3,7 +3,7 @@ import time
 
 from userController import checkIfUserExist , createUser, attemptLogin
 from menuController import getMenuItems, getItemIdByName
-from deliveryController import createDelivery, attemptToCancel, canRate, rateDelivery, tipDelivery
+from deliveryController import createDelivery, attemptToCancel, canRate, rateDelivery, tipDelivery, getTip
 from driverController import getAllAvailableDeliveries, checkIfDeliveryExist, pickupDelivery, completeDelivery, validPickupDelivery
 
 
@@ -156,13 +156,21 @@ def driverMode(UId, args):
                 continue
 
             arg = ""
+            currTip = 0
             while arg != "q":  
-                arg = input("[complete]: ")  # Driver must complete delivery
+                print("Current tip: $" + str(currTip))
+                arg = input("[complete], any button to refresh: ")  # Driver must complete delivery
                 
                 if arg == "complete":
                     completeDelivery(DId)
                     print("Thanks for completing a delivery!")
                     break
+                elif arg != "q":
+                    try:
+                        currTip = getTip(DId)
+                    except:
+                        print("error getting tip")
+                        
         elif args[0] == "complete":
             print("Delivery not picked up yet. Pickup a delivery, refresh or quit.")
 
@@ -173,11 +181,11 @@ def driverMode(UId, args):
 
 
 def presentAfterOrderOptions(id):
-    print("\n_____________________________")
-    print("order placed...\n")
+    print("\n________________________________________________ ")
+    print("\n----------------- ORDER PLACED ----------------- ")
     print("please wait for arrival")
     while True:
-        arg = input("[rate, leave, status, tip]: ")
+        arg = input("[leave, status, cancel order, rate, tip]: ")
         if arg == "rate":
             try:
                 if canRate(id):
@@ -198,10 +206,20 @@ def presentAfterOrderOptions(id):
             try:
                 tip = float(input("tip amount: $"))
                 tipDelivery(id, tip)
-                print("adding $" + tip + "tip")
-            except:
-                print("error. make sure tip is a number")
+                print("adding $" + str(tip) + " tip")
+            except Exception as e: 
+                print(e)
                 continue
+        elif arg == "cancel" or arg == "cancel order":
+            try:
+                if not attemptToCancel(id): #attempt to cancel is true if canceled before order is done
+                    print("order has already been delivered.\n")
+                    
+                else:
+                    print("canceled... goodbye\n\n\n")
+                    break
+            except:
+                print("error canceling order...")
 
         elif arg == "leave" or arg == "q":
             break
