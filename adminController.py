@@ -4,9 +4,9 @@ from connection import get_connection
 
 def getAvgRating(DriverId):  # returns average driver rating
     conn = get_connection()
-    sql = sqlalchemy.text("SELECT AVG(Rating) FROM deliveries WHERE Driverid = :id AND Status = \"dropped\" AND rating IS NOT NULL").bindparams(id=DriverId)
 
-    result = conn.execute(sql).first()[0]
+    result = conn.execute(sqlalchemy.text("SELECT AVG(Rating) FROM deliveries WHERE Driverid = :id AND Status = 'Dropped' AND rating IS NOT NULL"),
+         [{"id": DriverId}]).scalar()
 
     return result 
 
@@ -29,7 +29,8 @@ def getAllAvgRatings():  # returns list of [(name, avg driver rating), ...]
 
 def getMostPopularItems(rank):
     conn = get_connection()
-    sql = sqlalchemy.text("""
+
+    result = conn.execute(sqlalchemy.text("""
       WITH rankedGoods as (SELECT Name, COUNT(*) Total, RANK() OVER (ORDER BY COUNT(*) DESC) ranking
       FROM deliveryItems
       JOIN goods on goods.GId = deliveryItems.GId
@@ -37,9 +38,7 @@ def getMostPopularItems(rank):
       ORDER BY ranking ASC, Name ASC)
 
       SELECT Name, Total FROM rankedGoods
-      WHERE ranking <= :r """).bindparams(r=rank)
-
-    result = conn.execute(sql)
+      WHERE ranking <= :r """),[{"r": rank}])
 
     items = []
 
@@ -53,7 +52,8 @@ def getMostPopularItems(rank):
 # Need to validate Month and Year before running this function
 def getMonthlySpending(UId, month, year):  # returns sum cost of goods purchased by user in specified month
   conn = get_connection()
-  sql = sqlalchemy.text(""" 
+
+  result = conn.execute(sqlalchemy.text(""" 
   SELECT SUM(Cost)
   FROM deliveryItems
   JOIN goods on goods.GId = deliveryItems.GId
@@ -61,8 +61,6 @@ def getMonthlySpending(UId, month, year):  # returns sum cost of goods purchased
   WHERE CustomerId = :UId
   AND MONTH(PlacedTime) = :m
   AND YEAR(PlacedTime) = :y
-  """).bindparams(UId=UId,m=month,y=year)
-
-  result = conn.execute(sql).first()[0]
+  """),[{"UId": UId, "m": month, "y": year}]).scalar()
 
   return result
