@@ -48,7 +48,7 @@ def selectAllDeliveryItems():
 
 def selectAllUsers():
     conn = get_connection()
-    sql = "select * from users"
+    sql = "select count(*) from deliveries"
     result = conn.execute(sqlalchemy.text(sql))
 
     for row in result:

@@ -4,7 +4,7 @@ from connection import get_connection
 
 def getAvgRating(DriverId):  # returns average driver rating
     conn = get_connection()
-    sql = sqlalchemy.text("SELECT AVG(Rating) FROM deliveries WHERE DriverId = :id AND Status = \"Completed\" AND Rating IS NOT NULL").bindparams(id=DriverId)
+    sql = sqlalchemy.text("SELECT AVG(Rating) FROM deliveries WHERE Driverid = :id AND Status = \"dropped\" AND rating IS NOT NULL").bindparams(id=DriverId)
 
     result = conn.execute(sql).first()[0]
 
@@ -12,12 +12,11 @@ def getAvgRating(DriverId):  # returns average driver rating
 
 def getAllAvgRatings():  # returns list of [(name, avg driver rating), ...]
     conn = get_connection()
-    sql = sqlalchemy.text("""SELECT FirstName, LastName, AVG(Rating) 
+    sql = sqlalchemy.text("""select * from (SELECT FirstName, LastName, AVG(Rating) r
       FROM deliveries 
       JOIN users on users.UId = deliveries.DriverId
-      WHERE Status = "Completed" AND Rating IS NOT NULL 
-      GROUP BY FirstName, LastName
-      ORDER BY LastName ASC, FirstName ASC""" )
+      WHERE Status = "dropped" AND Rating IS NOT NULL 
+      GROUP BY FirstName, LastName) as t order by r desc""" )
 
     result = conn.execute(sql)
 

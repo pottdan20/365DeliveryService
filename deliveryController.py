@@ -19,7 +19,7 @@ def canRate(id): #true if driver has not picked up order yet
     with conn.begin():
         sql = sqlalchemy.text(" Select status from deliveries where Did = :did").bindparams(did = id)
         result = conn.execute(sql).first()[0]
-        if result != "delivered":
+        if result != "Completed":
             return False
         return True
 

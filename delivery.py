@@ -85,7 +85,7 @@ def main():
                     itemName = args[1]
                     quant = int(args[2])
                 except:
-                    print("invalid input format: add [name of item] [count]")
+                    print("invalid input format: remove [name of item] [count]")
                     args = None
                     continue
 
@@ -93,10 +93,10 @@ def main():
                     for i in range(0,len(cart)):
                         if cart[i].get("name") == itemName:
                             if(quant >=  cart[i].get("count")): #either adjusts the count of an item in cart or removes entierly
-                                del cart[i]
+                                 cart.pop(i)
                             else:
                                 cart[i]["count"] -= quant
-                    print("added")
+                    print("removed")
                 except:
                     print("error removing from. retry")
                     args = None
@@ -128,8 +128,8 @@ def driverMode(UId, args):
     open_deliveries = getAllAvailableDeliveries()
     for delivery in open_deliveries:
         print(f"\nDId: {delivery[0]}")
-        print(f"PickupLocation: {delivery[4]}")
-        print(f"PickupLocation: {delivery[5]}")
+        print(f"Pickup Location: {delivery[4]}")
+        print(f"Dropoff Location: {delivery[5]}")
 
     print("\nCommands:")
     print("\trefresh")
