@@ -128,8 +128,8 @@ def driverMode(UId, args):
     open_deliveries = getAllAvailableDeliveries()
     for delivery in open_deliveries:
         print(f"\nDId: {delivery[0]}")
-        print(f"PickupLocation: {delivery[4]}")
-        print(f"PickupLocation: {delivery[5]}")
+        print(f"Pickup Location: {delivery[4]}")
+        print(f"Dropoff Location: {delivery[5]}")
 
     print("\nCommands:")
     print("\trefresh")
