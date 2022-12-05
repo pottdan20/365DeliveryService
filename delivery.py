@@ -3,7 +3,7 @@ import time
 
 from userController import checkIfUserExist , createUser, attemptLogin
 from menuController import getMenuItems, getItemIdByName
-from deliveryController import createDelivery, attemptToCancel, canRate, rateDelivery
+from deliveryController import createDelivery, attemptToCancel, canRate, rateDelivery, tipDelivery
 from driverController import getAllAvailableDeliveries, checkIfDeliveryExist, pickupDelivery, completeDelivery, validPickupDelivery
 
 
@@ -174,10 +174,10 @@ def driverMode(UId, args):
 
 def presentAfterOrderOptions(id):
     print("\n_____________________________")
-    print("order placed...\nwait to rate this delivery or just leave and wait for arrival")
+    print("order placed...\n")
     print("please wait for arrival")
     while True:
-        arg = input("[rate,leave]: ")
+        arg = input("[rate, leave, status, tip]: ")
         if arg == "rate":
             try:
                 if canRate(id):
@@ -194,6 +194,15 @@ def presentAfterOrderOptions(id):
             except:
                 print("error rating...")
                 continue
+        elif arg == "tip":
+            try:
+                tip = float(input("tip amount: $"))
+                tipDelivery(id, tip)
+                print("adding $" + tip + "tip")
+            except:
+                print("error. make sure tip is a number")
+                continue
+
         elif arg == "leave" or arg == "q":
             break
         else:

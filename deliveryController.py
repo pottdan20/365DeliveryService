@@ -12,7 +12,7 @@ def createDelivery(customerId, address, cart): #return order id
 
     return Did
 def attemptToCancel(orderID):
-    print("canceling 123333")
+    print("canceling order number " + str(orderID))
 
 def canRate(id): #true if driver has not picked up order yet
     conn = get_connection()
@@ -26,6 +26,11 @@ def canRate(id): #true if driver has not picked up order yet
 def rateDelivery(id, rate):
     conn = get_connection()
     sql = sqlalchemy.text(" update deliveries set rating = :r where Did = :did").bindparams(did = id, r=rate)
+    result = conn.execute(sql)
+
+def tipDelivery(id, tip):
+    conn = get_connection()
+    sql = sqlalchemy.text(" update deliveries set tip = :t where Did = :did").bindparams(did = id, t=tip)
     result = conn.execute(sql)
     
 
