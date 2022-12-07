@@ -4,7 +4,7 @@ import time
 from userController import checkIfUserExist , createUser, attemptLogin
 from menuController import getMenuItems, getItemIdByName
 from deliveryController import createDelivery, attemptToCancel, canRate, rateDelivery, tipDelivery, getTip
-from driverController import getAllAvailableDeliveries, checkIfDeliveryExist, pickupDelivery, completeDelivery, validPickupDelivery
+from driverController import getAllAvailableDeliveries, checkActive,checkIfDeliveryExist, pickupDelivery, completeDelivery, validPickupDelivery
 
 
 def main():
@@ -68,6 +68,9 @@ def main():
 
                 try:
                     newItem = getItemIdByName(itemName)
+                    if newItem is None:
+                        print("must be a valid item name")
+                        continue
                     newEntry = True
                     for i in cart:
                         if i.get("id") == newItem:
@@ -84,23 +87,24 @@ def main():
                 try:
                     itemName = args[1]
                     quant = int(args[2])
+                    try:
+                        for i in range(0,len(cart)):
+                            if cart[i].get("name") == itemName:
+                                if(quant >=  cart[i].get("count")): #either adjusts the count of an item in cart or removes entierly
+                                    cart.pop(i)
+                                else:
+                                    cart[i]["count"] -= quant
+                        print("removed")
+                    except:
+                        print("error removing from. retry")
+                        args = None
+                        continue
                 except:
                     print("invalid input format: remove [name of item] [count]")
                     args = None
                     continue
 
-                try:
-                    for i in range(0,len(cart)):
-                        if cart[i].get("name") == itemName:
-                            if(quant >=  cart[i].get("count")): #either adjusts the count of an item in cart or removes entierly
-                                 cart.pop(i)
-                            else:
-                                cart[i]["count"] -= quant
-                    print("removed")
-                except:
-                    print("error removing from. retry")
-                    args = None
-                    continue
+                
             elif args[0] == "cart": #lists items in cart
                 for i in cart:
                     print(i.get("name") + ": " + str(i.get("count")))
@@ -157,8 +161,13 @@ def driverMode(UId, args):
 
             arg = ""
             currTip = 0
-            while arg != "q":  
+            active = True
+            while arg != "q" and active:  
                 print("Current tip: $" + str(currTip))
+                
+                if(not active):
+                    print("ORDER HAS BEEN CANCELED!!!")
+
                 arg = input("[complete], any button to refresh: ")  # Driver must complete delivery
                 
                 if arg == "complete":
@@ -168,6 +177,8 @@ def driverMode(UId, args):
                 elif arg != "q":
                     try:
                         currTip = getTip(DId)
+                        active = checkActive(DId)
+                        print("active: " + str(active))
                     except:
                         print("error getting tip")
                         
