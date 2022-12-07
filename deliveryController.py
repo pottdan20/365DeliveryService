@@ -47,6 +47,11 @@ def getTip(id):
     result = conn.execute(sql)
     return result.first()[0]
     
+def orderStatus(did):
+    conn = get_connection()
+    sql = sqlalchemy.text("select status from deliveries where did = :id").bindparams(id = did)
+    result = conn.execute(sql)
+    return str(result.first()[0])
 
 if __name__ == '__main__':
     createDelivery([{}])

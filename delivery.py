@@ -3,7 +3,7 @@ import time
 
 from userController import checkIfUserExist , createUser, attemptLogin
 from menuController import getMenuItems, getItemIdByName
-from deliveryController import createDelivery, attemptToCancel, canRate, rateDelivery, tipDelivery, getTip
+from deliveryController import orderStatus, createDelivery, attemptToCancel, canRate, rateDelivery, tipDelivery, getTip
 from driverController import getAllAvailableDeliveries, checkActive,checkIfDeliveryExist, pickupDelivery, completeDelivery, validPickupDelivery
 
 
@@ -41,7 +41,8 @@ def main():
                     password = input("password: ")
                     try:
                         currentUser = attemptLogin(username, password)
-                    except:
+                    except Exception as e: 
+                        print(e)
                         print("error: email or password are incorrect")
                         args = None
                         continue
@@ -116,7 +117,8 @@ def main():
                     addr = input("delivery address: ")
                     deliveryId = createDelivery(currentUser, addr, cart)
                     presentAfterOrderOptions(deliveryId)
-                except:
+                except Exception as e: 
+                    print(e)
                     print("error checkingout. please try again")
             elif args[0] == "clockin":  # Enter Driver Mode 
                 driverMode(currentUser, args) 
@@ -164,9 +166,6 @@ def driverMode(UId, args):
             active = True
             while arg != "q" and active:  
                 print("Current tip: $" + str(currTip))
-                
-                if(not active):
-                    print("ORDER HAS BEEN CANCELED!!!")
 
                 arg = input("[complete], any button to refresh: ")  # Driver must complete delivery
                 
@@ -178,7 +177,10 @@ def driverMode(UId, args):
                     try:
                         currTip = getTip(DId)
                         active = checkActive(DId)
-                        print("active: " + str(active))
+                        if(not active):
+                            print("\nORDER HAS BEEN CANCELED!!!\n")
+                        else:
+                            print("Order Is Active")
                     except:
                         print("error getting tip")
                         
@@ -189,6 +191,7 @@ def driverMode(UId, args):
             current_time = time.strftime('%Y-%m-%d %H:%M:%S')
             print(f"Clocked out at: {current_time}")
             break
+    
 
 
 def presentAfterOrderOptions(id):
@@ -221,6 +224,11 @@ def presentAfterOrderOptions(id):
             except Exception as e: 
                 print(e)
                 continue
+        elif arg == "status":
+            try:
+                print("Status: " + orderStatus(id))
+            except Exception as e: 
+                print(e)
         elif arg == "cancel" or arg == "cancel order":
             try:
                 if not attemptToCancel(id): #attempt to cancel is true if canceled before order is done
