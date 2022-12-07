@@ -5,7 +5,7 @@ from connection import get_connection
 
 def getAllAvailableDeliveries():
     conn = get_connection()
-    sql = sqlalchemy.text("SELECT * FROM deliveries WHERE Status = \"placed\"")
+    sql = sqlalchemy.text("SELECT * FROM deliveries WHERE Status = \"Placed\"")
     # sql = sqlalchemy.text("SELECT * FROM deliveries WHERE DriverId = :i").bindparams(i=None)
 
     result = conn.execute(sql)
@@ -27,12 +27,21 @@ def checkIfDeliveryExist(DId):
 def validPickupDelivery(DId):
 
     conn = get_connection()
-    sql = sqlalchemy.text("SELECT * FROM deliveries WHERE DId = :e AND Status = \"placed\"").bindparams(e = DId)
+    sql = sqlalchemy.text("SELECT * FROM deliveries WHERE DId = :e AND Status = \"Placed\"").bindparams(e = DId)
     result = conn.execute(sql).first()
     if(result):
         return True
 
     return False
+
+def checkActive(did):
+    conn = get_connection()
+    sql = sqlalchemy.text("select status from deliveries where did = :id").bindparams(id = did)
+    result = conn.execute(sql)
+    if result.first()[0] == "Canceled":
+        return False
+    return True
+
 
 def pickupDelivery(UId, DId):
     # Update delivery DriverId as UId
@@ -40,7 +49,7 @@ def pickupDelivery(UId, DId):
     # Change Status to "En Route"
     conn = get_connection()
 
-    sql = sqlalchemy.text("UPDATE deliveries SET Status = \"En Route\", DriverId = :UId, PickupTime = NOW() WHERE DId = :DId AND Status = \"placed\"").bindparams(UId=UId,DId=DId)
+    sql = sqlalchemy.text("UPDATE deliveries SET Status = \"En Route\", DriverId = :UId, PickupTime = NOW() WHERE DId = :DId AND Status = \"Placed\"").bindparams(UId=UId,DId=DId)
 
     with conn.begin():
         result = conn.execute(sql)
@@ -51,10 +60,9 @@ def completeDelivery(DId):
     # update delivery Status to "Completed"
     # update DropoffTime to current time
     conn = get_connection()
-
-    sql = sqlalchemy.text("UPDATE deliveries SET Status = \"Completed\", DropoffTime = NOW() WHERE DId = :DId AND Status = \"En Route\"").bindparams(DId=DId)
-
     with conn.begin():
+        sql = sqlalchemy.text("UPDATE deliveries SET Status = \"Completed\", DropoffTime = NOW() WHERE DId = :DId AND Status = \"En Route\"").bindparams(DId=DId)
         result = conn.execute(sql)
+
 
     return result   

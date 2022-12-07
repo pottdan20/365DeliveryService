@@ -40,7 +40,7 @@ def selectAllDeliveries():
 
 def selectAllDeliveryItems():
     conn = get_connection()
-    sql = "select * from deliveryItems"
+    sql = "select * from deliveryItems limit 1000"
     result = conn.execute(sqlalchemy.text(sql))
 
     for row in result:

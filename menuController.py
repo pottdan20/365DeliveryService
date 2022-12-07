@@ -19,7 +19,7 @@ def getMenuItems():
 def getItemIdByName(item):
     conn = get_connection()
     result = conn.execute(sqlalchemy.text("SELECT gid FROM goods WHERE Name = :i"), [{"i": item}]).scalar()
-    
+    print("menu id: " + str(result))
     return result
 
 

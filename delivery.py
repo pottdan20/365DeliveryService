@@ -3,8 +3,8 @@ import time
 
 from userController import checkIfUserExist , createUser, attemptLogin
 from menuController import getMenuItems, getItemIdByName
-from deliveryController import createDelivery, attemptToCancel, canRate, rateDelivery
-from driverController import getAllAvailableDeliveries, checkIfDeliveryExist, pickupDelivery, completeDelivery, validPickupDelivery
+from deliveryController import orderStatus, createDelivery, attemptToCancel, canRate, rateDelivery, tipDelivery, getTip
+from driverController import getAllAvailableDeliveries, checkActive,checkIfDeliveryExist, pickupDelivery, completeDelivery, validPickupDelivery
 
 
 def main():
@@ -41,7 +41,8 @@ def main():
                     password = input("password: ")
                     try:
                         currentUser = attemptLogin(username, password)
-                    except:
+                    except Exception as e: 
+                        print(e)
                         print("error: email or password are incorrect")
                         args = None
                         continue
@@ -68,6 +69,9 @@ def main():
 
                 try:
                     newItem = getItemIdByName(itemName)
+                    if newItem is None:
+                        print("must be a valid item name")
+                        continue
                     newEntry = True
                     for i in cart:
                         if i.get("id") == newItem:
@@ -84,23 +88,24 @@ def main():
                 try:
                     itemName = args[1]
                     quant = int(args[2])
+                    try:
+                        for i in range(0,len(cart)):
+                            if cart[i].get("name") == itemName:
+                                if(quant >=  cart[i].get("count")): #either adjusts the count of an item in cart or removes entierly
+                                    cart.pop(i)
+                                else:
+                                    cart[i]["count"] -= quant
+                        print("removed")
+                    except:
+                        print("error removing from. retry")
+                        args = None
+                        continue
                 except:
                     print("invalid input format: remove [name of item] [count]")
                     args = None
                     continue
 
-                try:
-                    for i in range(0,len(cart)):
-                        if cart[i].get("name") == itemName:
-                            if(quant >=  cart[i].get("count")): #either adjusts the count of an item in cart or removes entierly
-                                 cart.pop(i)
-                            else:
-                                cart[i]["count"] -= quant
-                    print("removed")
-                except:
-                    print("error removing from. retry")
-                    args = None
-                    continue
+                
             elif args[0] == "cart": #lists items in cart
                 for i in cart:
                     print(i.get("name") + ": " + str(i.get("count")))
@@ -112,7 +117,8 @@ def main():
                     addr = input("delivery address: ")
                     deliveryId = createDelivery(currentUser, addr, cart)
                     presentAfterOrderOptions(deliveryId)
-                except:
+                except Exception as e: 
+                    print(e)
                     print("error checkingout. please try again")
             elif args[0] == "clockin":  # Enter Driver Mode 
                 driverMode(currentUser, args) 
@@ -156,13 +162,28 @@ def driverMode(UId, args):
                 continue
 
             arg = ""
-            while arg != "q":  
-                arg = input("[complete]: ")  # Driver must complete delivery
+            currTip = 0
+            active = True
+            while arg != "q" and active:  
+                print("Current tip: $" + str(currTip))
+
+                arg = input("[complete], any button to refresh: ")  # Driver must complete delivery
                 
                 if arg == "complete":
                     completeDelivery(DId)
                     print("Thanks for completing a delivery!")
                     break
+                elif arg != "q":
+                    try:
+                        currTip = getTip(DId)
+                        active = checkActive(DId)
+                        if(not active):
+                            print("\nORDER HAS BEEN CANCELED!!!\n")
+                        else:
+                            print("Order Is Active")
+                    except:
+                        print("error getting tip")
+                        
         elif args[0] == "complete":
             print("Delivery not picked up yet. Pickup a delivery, refresh or quit.")
 
@@ -170,14 +191,15 @@ def driverMode(UId, args):
             current_time = time.strftime('%Y-%m-%d %H:%M:%S')
             print(f"Clocked out at: {current_time}")
             break
+    
 
 
 def presentAfterOrderOptions(id):
-    print("\n_____________________________")
-    print("order placed...\nwait to rate this delivery or just leave and wait for arrival")
+    print("\n________________________________________________ ")
+    print("\n----------------- ORDER PLACED ----------------- ")
     print("please wait for arrival")
     while True:
-        arg = input("[rate,leave]: ")
+        arg = input("[leave, status, cancel order, rate, tip]: ")
         if arg == "rate":
             try:
                 if canRate(id):
@@ -194,6 +216,30 @@ def presentAfterOrderOptions(id):
             except:
                 print("error rating...")
                 continue
+        elif arg == "tip":
+            try:
+                tip = float(input("tip amount: $"))
+                tipDelivery(id, tip)
+                print("adding $" + str(tip) + " tip")
+            except Exception as e: 
+                print(e)
+                continue
+        elif arg == "status":
+            try:
+                print("Status: " + orderStatus(id))
+            except Exception as e: 
+                print(e)
+        elif arg == "cancel" or arg == "cancel order":
+            try:
+                if not attemptToCancel(id): #attempt to cancel is true if canceled before order is done
+                    print("order has already been delivered.\n")
+                    
+                else:
+                    print("canceled... goodbye\n\n\n")
+                    break
+            except:
+                print("error canceling order...")
+
         elif arg == "leave" or arg == "q":
             break
         else:
