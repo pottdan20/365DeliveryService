@@ -64,3 +64,54 @@ def getMonthlySpending(UId, month, year):  # returns sum cost of goods purchased
   """),[{"UId": UId, "m": month, "y": year}]).scalar()
 
   return result
+
+def getTotalDeliveries():
+  conn = get_connection()
+  result = conn.execute(sqlalchemy.text("""
+  SELECT 
+    CONCAT(FirstName, " ", LastName) as Driver,
+    Count(*) TotalDeliveries
+  FROM deliveries 
+  JOIN users on users.UId = deliveries.DriverId
+  WHERE Status = "dropped" or Status = "Dropped"
+  GROUP BY Driver
+  ORDER BY TotalDeliveries DESC
+  """))
+
+  drivers = []
+
+  for row in result:
+    drivers.append((row[0], row[1]))
+
+  return drivers
+
+def getAvgDeliveryTimes():
+  conn = get_connection()
+  result = conn.execute(sqlalchemy.text("""
+  WITH difference_in_seconds AS (
+    SELECT 
+        CONCAT(FirstName, " ", LastName) as Driver,
+        AVG(TIMESTAMPDIFF(SECOND, PickupTime, DropoffTime)) as seconds
+    FROM deliveries 
+    JOIN users on users.UId = deliveries.DriverId
+    WHERE Status = "dropped" or Status = "Dropped"
+    GROUP BY Driver
+    ORDER BY seconds ASC
+  )
+
+  SELECT
+    Driver,
+    CONCAT(
+      FLOOR(seconds / 60), ' minutes ',
+      ROUND(MOD(seconds, 60), 0), ' seconds'
+    ) AS AvgDeliveryTime
+  FROM difference_in_seconds
+  """))
+
+  drivers = []
+
+  for row in result:
+    drivers.append((row[0], row[1]))
+
+  return drivers
+
