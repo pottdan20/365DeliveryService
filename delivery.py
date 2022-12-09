@@ -54,8 +54,9 @@ def main():
             # user is logged in for all code below
             
             args = input("Enter Command: ").split(" ")
-
-            if args[0] == "menu": #list menu
+            if(args[0] == "help"):
+                print("Commands:\nmenu\ncart\nadd [item] [count]\nremove [item] [count]\ncheckout\nclockin")
+            elif args[0] == "menu": #list menu
                 menuItems = getMenuItems()
                 print(menuItems)
             elif args[0] == "add": # add item
