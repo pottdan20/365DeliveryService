@@ -243,7 +243,6 @@ def presentAfterOrderOptions(id):
                 print("error canceling order...")
 
         elif arg == "leave" or arg == "q":
-            cart
             break
         else:
             print("please enter valid command\n")
