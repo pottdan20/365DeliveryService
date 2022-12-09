@@ -118,6 +118,7 @@ def main():
                     addr = input("delivery address: ")
                     deliveryId = createDelivery(currentUser, addr, cart)
                     presentAfterOrderOptions(deliveryId)
+                    cart = []
                 except Exception as e: 
                     print(e)
                     print("error checkingout. please try again")
@@ -152,7 +153,7 @@ def driverMode(UId, args):
             for delivery in open_deliveries:
                 print(f"\nDId: {delivery[0]}")
                 print(f"PickupLocation: {delivery[4]}")
-                print(f"PickupLocation: {delivery[5]}")
+                print(f"DropoffLocation: {delivery[5]}")
 
         elif args[0] == "pickup" and len(args) == 2:  
             DId = args[1]
